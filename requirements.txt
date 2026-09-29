@@ -1,0 +1,19 @@
+# Add backend dependencies here.
+# PDF processing
+PyMuPDF
+
+# RAG / text retrieval
+scikit-learn
+
+# LLM API
+openai
+
+# Environment variables
+python-dotenv
+
+# Backend API
+fastapi
+uvicorn
+
+# Request validation
+pydantic

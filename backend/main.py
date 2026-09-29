@@ -6,10 +6,18 @@ from backend.agents.ritam_agent import ask_ritam
 from backend.rag.search import search_drug
 from backend.services.gemini_services import check_drug_claim
 from backend.services.journey_service import build_journey
-
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 app = FastAPI(title="Ritam API")
 
+DRUGS_DIR = Path(__file__).resolve().parent / "data" / "drugs"
+
+app.mount(
+    "/drug-files",
+    StaticFiles(directory=DRUGS_DIR),
+    name="drug-files"
+)
 
 app.add_middleware(
     CORSMiddleware,

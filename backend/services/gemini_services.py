@@ -220,6 +220,10 @@ IMPORTANT:
 - Return only valid JSON.
 - source_indices must contain only the source numbers that
   directly support your classification.
+- Do not use Markdown formatting.
+- Do not use ** for bold text.
+- Do not use * for italics.
+- Use plain text only.
 
 Return exactly this structure:
 

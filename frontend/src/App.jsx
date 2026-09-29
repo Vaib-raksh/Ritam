@@ -82,10 +82,6 @@ function App() {
     [drug]
   );
 
-  /*
-    Dynamic theme.
-    Changing the medicine changes the entire visual atmosphere.
-  */
   useEffect(() => {
     document.documentElement.dataset.theme =
       currentDrug.theme;
@@ -93,6 +89,7 @@ function App() {
 
   const navigate = (nextPage) => {
     setPage(nextPage);
+
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -102,6 +99,7 @@ function App() {
   const selectDrug = (value) => {
     setDrug(value);
     setPage("medicine");
+
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -111,7 +109,6 @@ function App() {
   return (
     <div className="app-shell">
 
-      {/* Global cosmic atmosphere */}
       <CosmosBackground />
 
       {page !== "home" && (
@@ -181,6 +178,7 @@ function App() {
         {page === "evidence" && (
           <EvidencePage
             currentDrug={currentDrug}
+            drug={drug}
           />
         )}
 
@@ -290,7 +288,9 @@ function Sidebar({
         />
 
         <div>
-          <div className="brand-name">RITAM</div>
+          <div className="brand-name">
+            RITAM
+          </div>
 
           <div className="brand-subtitle">
             AI medication companion
@@ -385,6 +385,7 @@ function Topbar({
     <header className="topbar">
 
       <div className="breadcrumb">
+
         <button
           onClick={() => navigate("home")}
         >
@@ -394,6 +395,7 @@ function Topbar({
         <span>/</span>
 
         <span>{currentDrug.name}</span>
+
       </div>
 
       <div className="topbar-actions">
@@ -442,21 +444,47 @@ function Home({
   selectDrug,
 }) {
   const [hoveredDrug, setHoveredDrug] = useState(null);
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
-  const activeDrug = drugs[hoveredDrug || drug];
+
+  const [pointer, setPointer] = useState({
+    x: 0,
+    y: 0,
+  });
+
+  const activeDrug =
+    drugs[hoveredDrug || drug];
 
   const handlePointerMove = (event) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
-    const y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
-    setPointer({ x, y });
+    const bounds =
+      event.currentTarget.getBoundingClientRect();
+
+    const x =
+      ((event.clientX - bounds.left) /
+        bounds.width -
+        0.5) *
+      2;
+
+    const y =
+      ((event.clientY - bounds.top) /
+        bounds.height -
+        0.5) *
+      2;
+
+    setPointer({
+      x,
+      y,
+    });
   };
 
   return (
     <section
       className="home-page"
       onMouseMove={handlePointerMove}
-      onMouseLeave={() => setPointer({ x: 0, y: 0 })}
+      onMouseLeave={() =>
+        setPointer({
+          x: 0,
+          y: 0,
+        })
+      }
       style={{
         "--pointer-x": `${pointer.x * 18}px`,
         "--pointer-y": `${pointer.y * 18}px`,
@@ -464,6 +492,7 @@ function Home({
     >
 
       <div className="home-cosmos-orbit orbit-home-one"></div>
+
       <div className="home-cosmos-orbit orbit-home-two"></div>
 
       <div className="home-logo-wrap">
@@ -480,66 +509,99 @@ function Home({
 
         <div className="home-copy">
 
-        <div className="eyebrow">
-          <span className="eyebrow-signal"></span>
-          AI MEDICATION COMPANION · LIVE
+          <div className="eyebrow">
+            <span className="eyebrow-signal"></span>
+            AI MEDICATION COMPANION · LIVE
+          </div>
+
+          <h1>
+            Your medicine,
+            <br />
+            <span>
+              explained like a human.
+            </span>
+          </h1>
+
+          <p className="home-description">
+            Ritam transforms complex official drug
+            documentation into simple, conversational
+            and evidence-grounded information for
+            patients and caregivers.
+          </p>
+
+          <div className="home-trust">
+
+            <span>01</span>
+            Official evidence
+
+            <span className="trust-line"></span>
+
+            <span>02</span>
+            Plain language
+
+            <span className="trust-line"></span>
+
+            <span>03</span>
+            No guessing
+
+          </div>
+
+          <button
+            className="home-launch"
+            onClick={() =>
+              selectDrug(drug)
+            }
+          >
+            <span>
+              Enter your medicine orbit
+            </span>
+
+            <span className="launch-arrow">
+              ↗
+            </span>
+          </button>
+
         </div>
 
-        <h1>
-          Your medicine,
-          <br />
-          <span>explained like a human.</span>
-        </h1>
-
-        <p className="home-description">
-          Ritam transforms complex official drug
-          documentation into simple, conversational
-          and evidence-grounded information for
-          patients and caregivers.
-        </p>
-
-        <div className="home-trust">
-
-          <span>01</span>
-          Official evidence
-
-          <span className="trust-line"></span>
-
-          <span>02</span>
-          Plain language
-
-          <span className="trust-line"></span>
-
-          <span>03</span>
-          No guessing
-
-        </div>
-
-        <button
-          className="home-launch"
-          onClick={() => selectDrug(drug)}
+        <div
+          className="home-orbit-stage"
+          aria-label={`${activeDrug.name} orbit preview`}
         >
-          <span>Enter your medicine orbit</span>
-          <span className="launch-arrow">↗</span>
-        </button>
 
-        </div>
-
-        <div className="home-orbit-stage" aria-label={`${activeDrug.name} orbit preview`}>
           <div className="orbit-stage-grid"></div>
+
           <div className="stage-arc stage-arc-one"></div>
+
           <div className="stage-arc stage-arc-two"></div>
+
           <div className="stage-planet">
-            <span>{activeDrug.name.charAt(0)}</span>
+
+            <span>
+              {activeDrug.name.charAt(0)}
+            </span>
+
             <i></i>
+
           </div>
+
           <div className="stage-satellite satellite-one"></div>
+
           <div className="stage-satellite satellite-two"></div>
+
           <div className="stage-caption">
+
             <span>NOW SCANNING</span>
-            <strong>{activeDrug.name}</strong>
-            <small>{activeDrug.type}</small>
+
+            <strong>
+              {activeDrug.name}
+            </strong>
+
+            <small>
+              {activeDrug.type}
+            </small>
+
           </div>
+
         </div>
 
         <div className="medicine-picker">
@@ -552,6 +614,7 @@ function Home({
 
             {Object.entries(drugs).map(
               ([id, item]) => (
+
                 <button
                   key={id}
                   className={`medicine-card ${
@@ -560,8 +623,12 @@ function Home({
                       : ""
                   }`}
                   data-theme={item.theme}
-                  onMouseEnter={() => setHoveredDrug(id)}
-                  onMouseLeave={() => setHoveredDrug(null)}
+                  onMouseEnter={() =>
+                    setHoveredDrug(id)
+                  }
+                  onMouseLeave={() =>
+                    setHoveredDrug(null)
+                  }
                   onClick={() =>
                     selectDrug(id)
                   }
@@ -588,6 +655,7 @@ function Home({
                   </span>
 
                 </button>
+
               )
             )}
 
@@ -1029,22 +1097,35 @@ function AskRitam({
                               sourceIndex
                             ) => (
 
-                              <span
+                              <button
                                 key={
                                   sourceIndex
                                 }
+                                className="evidence-link"
+                                onClick={() => {
+
+                                  if (
+                                    source.pdf_url
+                                  ) {
+
+                                    window.open(
+                                      `${API_URL}${source.pdf_url}`,
+                                      "_blank"
+                                    );
+
+                                  }
+
+                                }}
                               >
-                                Evidence ·
-                                Page{" "}
-                                {
-                                  source.page
-                                }
-                              </span>
+                                Evidence · Page{" "}
+                                {source.page}
+                              </button>
 
                             )
                           )}
 
                         </div>
+
                       )}
 
                     </div>
@@ -1239,9 +1320,11 @@ function MedicationJourney({
         if (
           data.journey?.length > 0
         ) {
+
           setSelected(
             data.journey[0]
           );
+
         }
 
       } catch (error) {
@@ -1281,22 +1364,28 @@ function MedicationJourney({
           <div className="journey-universe">
 
             <div className="journey-stars">
+
               {Array.from(
                 { length: 20 },
                 (_, index) => (
+
                   <span
                     key={index}
                     style={{
                       left:
                         `${(index * 43) % 100}%`,
+
                       top:
                         `${(index * 71) % 100}%`,
+
                       animationDelay:
                         `${index * 0.25}s`,
                     }}
                   />
+
                 )
               )}
+
             </div>
 
             <div className="journey-orbit orbit-large"></div>
@@ -1375,6 +1464,7 @@ function MedicationJourney({
                   </button>
 
                 );
+
               }
             )}
 
@@ -1389,12 +1479,14 @@ function MedicationJourney({
                 <div>
 
                   <span className="eyebrow">
+
                     {selected.id
                       .replace(
                         "_",
                         " "
                       )
                       .toUpperCase()}
+
                   </span>
 
                   <h2>
@@ -1406,9 +1498,7 @@ function MedicationJourney({
                 <div className="source-pill">
                   Page{" "}
                   {selected.sources
-                    ?.[
-                      0
-                    ]?.page || "—"}
+                    ?.[0]?.page || "—"}
                 </div>
 
               </div>
@@ -1590,6 +1680,7 @@ function HeardPage({
                 : "Check claim"}
 
               <span>→</span>
+
             </button>
 
           </div>
@@ -1712,11 +1803,28 @@ function HeardPage({
                   index
                 ) => (
 
-                  <div key={index}>
+                  <button
+                    key={index}
+                    className="evidence-link"
+                    onClick={() => {
+
+                      if (
+                        source.pdf_url
+                      ) {
+
+                        window.open(
+                          `${API_URL}${source.pdf_url}`,
+                          "_blank"
+                        );
+
+                      }
+
+                    }}
+                  >
                     Official document ·
                     Page{" "}
                     {source.page}
-                  </div>
+                  </button>
 
                 )
               )}
@@ -1740,7 +1848,22 @@ function HeardPage({
 
 function EvidencePage({
   currentDrug,
+  drug,
 }) {
+  const openDrugPdf = () => {
+
+    const pdfName =
+      `${currentDrug.name.toUpperCase()}.pdf`;
+
+    const pdfUrl =
+      `${API_URL}/drug-files/${drug}/${pdfName}`;
+
+    window.open(
+      pdfUrl,
+      "_blank"
+    );
+  };
+
   return (
     <section className="page evidence-page">
 
@@ -1755,6 +1878,7 @@ function EvidencePage({
         <div className="evidence-document">
 
           <div className="document-top">
+
             <span>
               OFFICIAL DOCUMENT
             </span>
@@ -1762,6 +1886,7 @@ function EvidencePage({
             <span>
               PDF
             </span>
+
           </div>
 
           <div className="document-lines">
@@ -1817,6 +1942,15 @@ function EvidencePage({
             <span>Answer</span>
 
           </div>
+
+          <button
+            className="primary-button"
+            onClick={openDrugPdf}
+          >
+            Open official PDF
+
+            <span>↗</span>
+          </button>
 
         </div>
 

@@ -36,9 +36,18 @@ def ask_ritam(question, drug_name, mode="patient"):
     sources = []
 
     for item in evidence:
+
+        pdf_url = (
+            f"/drug-files/"
+            f"{drug_name.lower()}/"
+            f"{item['source']}"
+            f"#page={item['page']}"
+        )
+
         sources.append({
             "page": item["page"],
-            "source": item["source"]
+            "source": item["source"],
+            "pdf_url": pdf_url
         })
 
     return {
@@ -70,4 +79,8 @@ if __name__ == "__main__":
         print(
             f"Page {source['page']} - "
             f"{source['source']}"
+        )
+
+        print(
+            f"PDF: {source['pdf_url']}"
         )

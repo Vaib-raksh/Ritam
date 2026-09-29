@@ -1,15 +1,21 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from pathlib import Path
 
 from backend.agents.ritam_agent import ask_ritam
 from backend.rag.search import search_drug
 from backend.services.gemini_services import check_drug_claim
 from backend.services.journey_service import build_journey
-from fastapi.staticfiles import StaticFiles
-from pathlib import Path
+
 
 app = FastAPI(title="Ritam API")
+
+
+# --------------------------------------------------
+# DRUG PDF FILES
+# --------------------------------------------------
 
 DRUGS_DIR = Path(__file__).resolve().parent / "data" / "drugs"
 
@@ -19,12 +25,17 @@ app.mount(
     name="drug-files"
 )
 
+
+# --------------------------------------------------
+# CORS
+# --------------------------------------------------
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://ritam-nine.vercel.app"
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://ritam-nine.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -32,11 +43,19 @@ app.add_middleware(
 )
 
 
+# --------------------------------------------------
+# REQUEST MODEL
+# --------------------------------------------------
+
 class ChatRequest(BaseModel):
     drug: str
     question: str
     mode: str = "patient"
 
+
+# --------------------------------------------------
+# ROOT
+# --------------------------------------------------
 
 @app.get("/")
 def root():
@@ -44,6 +63,10 @@ def root():
         "message": "Ritam API is running"
     }
 
+
+# --------------------------------------------------
+# CHAT
+# --------------------------------------------------
 
 @app.post("/chat")
 def chat(request: ChatRequest):
@@ -56,6 +79,10 @@ def chat(request: ChatRequest):
 
     return result
 
+
+# --------------------------------------------------
+# CLAIM CHECK
+# --------------------------------------------------
 
 @app.post("/claim-check")
 def claim_check(request: ChatRequest):
@@ -82,7 +109,13 @@ def claim_check(request: ChatRequest):
 
             sources.append({
                 "page": item["page"],
-                "source": item["source"]
+                "source": item["source"],
+                "pdf_url": (
+                    f"/drug-files/"
+                    f"{request.drug.lower()}/"
+                    f"{item['source']}"
+                    f"#page={item['page']}"
+                )
             })
 
     return {
@@ -90,12 +123,20 @@ def claim_check(request: ChatRequest):
             "status",
             "UNCLEAR"
         ),
+
         "explanation": result.get(
             "explanation",
             "I couldn't determine this claim from the approved drug document."
         ),
+
         "sources": sources
     }
+
+
+# --------------------------------------------------
+# MEDICATION JOURNEY
+# --------------------------------------------------
+
 @app.get("/journey/{drug_name}")
 def journey(drug_name: str):
 

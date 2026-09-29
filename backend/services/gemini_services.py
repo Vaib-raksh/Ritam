@@ -1,8 +1,12 @@
 import os
+import json
+
 from dotenv import load_dotenv
 from openai import OpenAI
 
+
 load_dotenv()
+
 
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
@@ -10,12 +14,25 @@ client = OpenAI(
 )
 
 
-def generate_rag_answer(question, drug_name, evidence, mode="patient"):
+# =========================================================
+# GENERATE RAG ANSWER
+# =========================================================
 
+def generate_rag_answer(
+    question,
+    drug_name,
+    evidence,
+    mode="patient"
+):
+
+    # -----------------------------------------------------
     # Build evidence text
+    # -----------------------------------------------------
+
     evidence_text = ""
 
     for i, item in enumerate(evidence):
+
         evidence_text += f"""
 SOURCE {i + 1}
 Drug: {item['drug']}
@@ -27,7 +44,11 @@ Content:
 -------------------------
 """
 
+
+    # -----------------------------------------------------
     # Mode-specific instructions
+    # -----------------------------------------------------
+
     if mode == "caregiver":
 
         mode_instruction = """
@@ -39,6 +60,7 @@ Explain the approved information in a practical,
 easy-to-understand way for a caregiver.
 
 Focus only on information supported by the evidence, such as:
+
 - how the medicine should be taken
 - documented warnings
 - documented side effects or symptoms
@@ -57,6 +79,11 @@ You are answering in PATIENT MODE.
 Explain the approved medication information directly
 to the person taking the medicine.
 """
+
+
+    # -----------------------------------------------------
+    # Main prompt
+    # -----------------------------------------------------
 
     prompt = f"""
 You are Ritam, an AI medication information companion.
@@ -116,6 +143,7 @@ by one or more of the supplied SOURCE sections.
 
 12. Mention the page number immediately after the relevant
 information, for example:
+
 "Metformin should not be taken by people with kidney
 problems. (Page 22)"
 
@@ -129,19 +157,42 @@ present in the approved evidence.
 
 16. If only part of the question is supported, answer only
 that part and clearly state that the remaining information
-was not found."""
+was not found.
+
+17. FORMATTING RULES:
+
+- Use plain text only.
+- Do NOT use Markdown formatting.
+- Do NOT use ** for bold text.
+- Do NOT use * for italics.
+- Do NOT use __ for bold text.
+- Do NOT use Markdown headings such as # or ##.
+- Do NOT use Markdown bullet syntax such as * or -.
+- Do NOT wrap words or sentences in special formatting.
+- Keep the answer clean and readable.
+- You may use simple numbered lists when needed.
+"""
+
+
+    # -----------------------------------------------------
+    # Call OpenRouter
+    # -----------------------------------------------------
 
     response = client.chat.completions.create(
+
         model="openrouter/free",
+
         messages=[
             {
                 "role": "system",
                 "content": (
                     "You are Ritam. "
                     "You must strictly follow the approved "
-                    "evidence provided by the application."
+                    "evidence provided by the application. "
+                    "Return answers in plain text without Markdown."
                 )
             },
+
             {
                 "role": "user",
                 "content": prompt
@@ -149,20 +200,47 @@ was not found."""
         ]
     )
 
-    return response.choices[0].message.content
+
+    # -----------------------------------------------------
+    # Get answer
+    # -----------------------------------------------------
+
+    answer = response.choices[0].message.content.strip()
 
 
-if __name__ == "__main__":
-    print("Ritam OpenRouter service loaded successfully.")
+    # -----------------------------------------------------
+    # Remove accidental Markdown formatting
+    # -----------------------------------------------------
 
-import json
+    answer = answer.replace("**", "")
+    answer = answer.replace("__", "")
+
+    # Remove single Markdown italic markers.
+    # This is intentionally done after removing **.
+    answer = answer.replace("*", "")
 
 
-def check_drug_claim(question, drug_name, evidence):
+    return answer
+
+
+# =========================================================
+# CLAIM CHECKER
+# =========================================================
+
+def check_drug_claim(
+    question,
+    drug_name,
+    evidence
+):
+
+    # -----------------------------------------------------
+    # Build evidence text
+    # -----------------------------------------------------
 
     evidence_text = ""
 
     for i, item in enumerate(evidence):
+
         evidence_text += f"""
 SOURCE {i + 1}
 Page: {item['page']}
@@ -172,6 +250,11 @@ Content:
 {item['text']}
 -------------------------
 """
+
+
+    # -----------------------------------------------------
+    # Claim-check prompt
+    # -----------------------------------------------------
 
     prompt = f"""
 You are Ritam, an AI medication information companion.
@@ -195,17 +278,21 @@ Use ONLY the approved evidence.
 Classify the claim as exactly ONE of:
 
 SUPPORTED
+
 The evidence directly supports the claim.
 
 CONTRADICTED
+
 The evidence directly says something that conflicts with
 the claim.
 
 NOT_MENTIONED
+
 The approved evidence does not contain enough information
 to support or contradict the claim.
 
 UNCLEAR
+
 The evidence discusses the topic but is not clear enough
 to determine whether the claim is supported or contradicted.
 
@@ -234,17 +321,26 @@ Return exactly this structure:
 }}
 """
 
+
+    # -----------------------------------------------------
+    # Call OpenRouter
+    # -----------------------------------------------------
+
     response = client.chat.completions.create(
+
         model="openrouter/free",
+
         messages=[
             {
                 "role": "system",
                 "content": (
                     "You are Ritam. "
                     "You must classify claims only from the "
-                    "approved evidence provided."
+                    "approved evidence provided. "
+                    "Return valid JSON only."
                 )
             },
+
             {
                 "role": "user",
                 "content": prompt
@@ -252,19 +348,59 @@ Return exactly this structure:
         ]
     )
 
-    raw_answer = response.choices[0].message.content.strip()
+
+    # -----------------------------------------------------
+    # Read response
+    # -----------------------------------------------------
+
+    raw_answer = (
+        response.choices[0]
+        .message
+        .content
+        .strip()
+    )
+
+
+    # -----------------------------------------------------
+    # Remove Markdown formatting if the explanation
+    # accidentally contains it
+    # -----------------------------------------------------
+
+    raw_answer = raw_answer.replace("**", "")
+    raw_answer = raw_answer.replace("__", "")
+
+
+    # -----------------------------------------------------
+    # Parse JSON
+    # -----------------------------------------------------
 
     try:
+
         result = json.loads(raw_answer)
 
     except json.JSONDecodeError:
+
         return {
             "status": "UNCLEAR",
+
             "explanation": (
                 "I couldn't determine this claim from the "
                 "approved drug document."
             ),
+
             "source_indices": []
         }
 
-    return result    
+
+    return result
+
+
+# =========================================================
+# TEST
+# =========================================================
+
+if __name__ == "__main__":
+
+    print(
+        "Ritam OpenRouter service loaded successfully."
+    )

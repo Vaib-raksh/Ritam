@@ -318,7 +318,3 @@ Ritam is an educational and informational AI project designed to explain approve
 It is not intended to diagnose medical conditions, prescribe medication, recommend personalized dosage changes, replace professional medical advice, or replace treatment provided by healthcare professionals.
 
 For urgent or emergency medical situations, seek appropriate professional medical assistance.
-
-
-This version is much closer to your **AaharWise README style**: concise, professional, project-focused, and easy for a recruiter/judge to scan.
-```

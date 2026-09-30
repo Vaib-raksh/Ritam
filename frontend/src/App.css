@@ -305,6 +305,11 @@ textarea {
   line-height: 0.98;
   letter-spacing: -0.055em;
   font-weight: 600;
+
+  /* CHANGED: makes Ask Ritam, Medication Journey,
+     I Heard and Evidence headings white */
+  color: #ffffff;
+
   text-shadow: 0 0 45px var(--accent-soft);
 }
 
@@ -2598,7 +2603,8 @@ textarea {
     gap: 7px;
   }
 }
-  .evidence-link {
+
+.evidence-link {
   border: none;
   background: transparent;
   cursor: pointer;

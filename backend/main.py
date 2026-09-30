@@ -8,6 +8,7 @@ from backend.agents.ritam_agent import ask_ritam
 from backend.rag.search import search_drug
 from backend.services.gemini_services import check_drug_claim
 from backend.services.journey_service import build_journey
+from backend.agents.safety import evaluate_clinical_triage
 
 
 app = FastAPI(title="Ritam API")
@@ -67,9 +68,21 @@ def root():
 # --------------------------------------------------
 # CHAT
 # --------------------------------------------------
-
 @app.post("/chat")
 def chat(request: ChatRequest):
+
+    # -----------------------------------------------------
+    # DETERMINISTIC SAFETY TRIAGE
+    # -----------------------------------------------------
+
+    triage_alert = evaluate_clinical_triage(request.question)
+
+    if triage_alert:
+        return triage_alert
+
+    # -----------------------------------------------------
+    # NORMAL RITAM PIPELINE
+    # -----------------------------------------------------
 
     result = ask_ritam(
         question=request.question,
@@ -78,7 +91,6 @@ def chat(request: ChatRequest):
     )
 
     return result
-
 
 # --------------------------------------------------
 # CLAIM CHECK

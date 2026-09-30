@@ -65,19 +65,17 @@ def evaluate_clinical_triage(query: str) -> dict | None:
     # -----------------------------------------------------
 
     tier_2_patterns = [
-        r"\bdouble\s+(my\s+)?(dose|dosing|tablet|pill)\b",
-        r"\btake\s+(two|2|double)\s+to\s+catch\s+up\b",
-        r"\bcatch\s+up\b",
-        r"\bstop\s+taking\s+(cold\s+turkey|abruptly|completely)\b",
-        r"\bcut\s+(my\s+)?(pill|tablet|capsule)\s+in\s+half\b",
-        r"\bcrush\s+(the\s+)?(pill|tablet|capsule)\b",
-        r"\bincrease\s+(my\s+)?dose\b",
-        r"\bdecrease\s+(my\s+)?dose\b",
-        r"\bchange\s+(my\s+)?dose\b",
-        r"\bchange\s+(my\s+)?dosage\b",
-        r"\bstop\s+(my\s+)?medication\b",
-        r"\bstop\s+(taking\s+)?(my\s+)?medicine\b",
-    ]
+    r"\bdouble\s+(my\s+)?(dose|dosing|tablet|pill)\b",
+    r"\btake\s+(two|2|double)\s+to\s+catch\s+up\b",
+    r"\bcatch\s+up\b",
+    r"\bstop\s+taking\s+(cold\s+turkey|abruptly|completely)\b",
+    r"\bcut\s+(my\s+)?(pill|tablet|capsule)\s+in\s+half\b",
+    r"\bcrush\s+(the\s+)?(pill|tablet|capsule)\b",
+    r"\b(increase|raise|up|change|adjust)\s+(my\s+)?(dose|dosage)\b",
+    r"\bdecrease\s+(my\s+)?dose\b",
+    r"\bstop\s+(my\s+)?medication\b",
+    r"\bstop\s+(taking\s+)?(my\s+)?medicine\b",
+]
 
     for pattern in tier_2_patterns:
 

@@ -107,6 +107,34 @@ APPROVED EVIDENCE:
 
 STRICT RULES:
 
+SAFETY GUARDRAIL:
+
+If the user asks whether they should change, increase,
+decrease, double, skip, start, stop, or otherwise alter
+their medication dose or schedule:
+
+1. Do not make the medication decision for the user.
+
+2. Do not calculate or suggest a replacement dose.
+
+3. Do not tell the user to double, skip, increase,
+decrease, start, or stop a dose unless the approved
+document explicitly gives that exact instruction.
+
+4. Do not turn general dosage information into a
+personalized dosing recommendation.
+
+5. If the approved document does not directly answer
+the user's specific situation, say:
+
+"I couldn't find that information in the approved drug
+document, so I don't want to guess. Please speak with
+your doctor or pharmacist for guidance on what to do."
+
+6. Do not use general medical knowledge to fill in
+missing information.
+
+
 1. Use ONLY facts explicitly stated in the APPROVED EVIDENCE.
 
 2. Do NOT use general medical knowledge, even if you believe
@@ -209,8 +237,6 @@ to understand, not to change what the document says.
 18. Every factual statement must still be supported by
 the approved evidence.
 """
-
-
     # -----------------------------------------------------
     # Call OpenRouter
     # -----------------------------------------------------

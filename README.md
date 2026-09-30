@@ -299,6 +299,9 @@ Never commit API keys or `.env` files to the repository.
 
 ## Live Demo
 
+**Try Ritam:**  
+https://ritam-nine.vercel.app/
+
 **Frontend**
 
 [https://ritam-nine.vercel.app](https://ritam-nine.vercel.app)
